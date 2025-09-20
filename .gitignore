@@ -23,6 +23,8 @@ output/
 assets/00000.png
 assets/00012.png
 assets/IMG_2647.MOV
+assets/*.mp4
+assets/*.mov
 
 # ignore licensed model files
 models/FLAME2020/
