@@ -34,7 +34,7 @@ img_path = './assets/FFHQ/00002.png'
 
 # if realign == True, 
 # img will be replaced by the realigned image
-ret_dict = tracker.load_image_and_run(img_path, realign=True, photometric_fitting=False) 
+ret_dict = tracker.load_image_and_run(img_path, realign=True, photometric_fitting=True) 
 
 # plot(ret_dict)
 
