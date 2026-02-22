@@ -96,7 +96,7 @@ def to_batch(path):
 
 
 def load_checkpoint(args, mica):
-    checkpoint = torch.load(args.m)
+    checkpoint = torch.load(args.m, weights_only=False)
     if 'arcface' in checkpoint:
         mica.arcface.load_state_dict(checkpoint['arcface'])
     if 'flameModel' in checkpoint:

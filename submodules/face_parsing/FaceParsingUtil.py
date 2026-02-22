@@ -69,7 +69,7 @@ class FaceParsing():
 
         # Face Parsing Model
         self.parsing_net = BiSeNet(n_classes=19).cuda().eval()
-        self.parsing_net.load_state_dict(torch.load(model_path))
+        self.parsing_net.load_state_dict(torch.load(model_path, weights_only=False))
 
         self.to_tensor = transforms.Compose([
             transforms.ToTensor(),

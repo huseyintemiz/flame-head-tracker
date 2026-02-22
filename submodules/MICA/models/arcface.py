@@ -167,7 +167,7 @@ class Arcface(IResNet):
         super(Arcface, self).__init__(IBasicBlock, [3, 13, 30, 3], **kwargs)
         if pretrained_path is not None and os.path.exists(pretrained_path):
             # logger.info(f'[Arcface] Initializing from insightface model from {pretrained_path}.')
-            self.load_state_dict(torch.load(pretrained_path))
+            self.load_state_dict(torch.load(pretrained_path, weights_only=False))
         self.freezer([self.layer1, self.layer2, self.layer3, self.conv1, self.bn1, self.prelu])
 
     def freezer(self, layers):

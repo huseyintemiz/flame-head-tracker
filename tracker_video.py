@@ -176,5 +176,23 @@ def track_video(tracker_cfg):
 
     pbar.close()
 
+    # Generate output video from compare images
+    output_fps = tracker_cfg.get('output_fps', tracker_cfg.get('subsample_fps', 25))
+    video_output_path = os.path.join(result_save_path, f'{video_name}_compare.mp4')
+    # collect compare images in order
+    compare_files = sorted(
+        [f for f in os.listdir(result_save_path) if f.endswith('_compare.jpg')],
+        key=lambda x: int(x.split('_')[0])
+    )
+    if len(compare_files) > 0:
+        first_img = cv2.imread(os.path.join(result_save_path, compare_files[0]))
+        h, w = first_img.shape[:2]
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        writer = cv2.VideoWriter(video_output_path, fourcc, output_fps, (w, h))
+        for f in compare_files:
+            img = cv2.imread(os.path.join(result_save_path, f))
+            writer.write(img)
+        writer.release()
+        print(f'>>> Output video saved to: {video_output_path} ({len(compare_files)} frames, {output_fps} fps)')
 
 

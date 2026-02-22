@@ -66,7 +66,7 @@ class Tester(object):
         dist.barrier()
         map_location = {'cuda:%d' % 0: 'cuda:%d' % self.device}
 
-        checkpoint = torch.load(model_path, map_location)
+        checkpoint = torch.load(model_path, map_location, weights_only=False)
 
         if 'arcface' in checkpoint:
             self.nfc.arcface.load_state_dict(checkpoint['arcface'])

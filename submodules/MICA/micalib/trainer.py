@@ -100,7 +100,7 @@ class Trainer(object):
         if os.path.exists(self.cfg.pretrained_model_path):
             model_path = self.cfg.pretrained_model_path
         if os.path.exists(model_path):
-            checkpoint = torch.load(model_path, map_location)
+            checkpoint = torch.load(model_path, map_location, weights_only=False)
             if 'opt' in checkpoint:
                 self.opt.load_state_dict(checkpoint['opt'])
             if 'scheduler' in checkpoint:

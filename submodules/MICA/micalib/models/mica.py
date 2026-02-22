@@ -51,7 +51,7 @@ class MICA(BaseModel):
         model_path = './models/mica.tar'  # edited by Peizhi
         if os.path.exists(model_path):
             # logger.info(f'[{self.tag}] Trained model found. Path: {model_path} | GPU: {self.device}')
-            checkpoint = torch.load(model_path)
+            checkpoint = torch.load(model_path, weights_only=False)
             if 'arcface' in checkpoint:
                 self.arcface.load_state_dict(checkpoint['arcface'])
             if 'flameModel' in checkpoint:

@@ -92,7 +92,7 @@ class Tracker():
         if 'ear_landmarker_path' in tracker_cfg:
             # use ear landmarks during fitting
             self.use_ear_landmarks = True
-            self.ear_landmarker = torch.load(tracker_cfg['ear_landmarker_path']).eval() # load the ONNX converted ear landmarker model
+            self.ear_landmarker = torch.load(tracker_cfg['ear_landmarker_path'], weights_only=False).eval() # load the ONNX converted ear landmarker model
             self.ear_landmarker = self.ear_landmarker.to(self.device)
         else:
             self.use_ear_landmarks = False
