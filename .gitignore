@@ -47,3 +47,4 @@ models/models.tar
 *.mp4
 *.pt
 *.log
+get_video/tracking_results_timed/
