@@ -277,6 +277,7 @@ def track_video(tracker_cfg):
     #######################
     print(f'>>> Tracking video: {video_path}')
     i = 0; total_steps = len(frames)
+    prev_frame_params = None
     pbar = tqdm(total=total_steps)
     while i < total_steps:
 
@@ -284,7 +285,13 @@ def track_video(tracker_cfg):
 
         # fit on the current frame
         batch_ret_dict, batch_valid_indices = tracker.run(img=batch_frames, realign=realign, photometric_fitting=photometric_fitting,
-                                                          shape_code=shape_code, texture=texture, temporal_smoothing=True)
+                                                          shape_code=shape_code, texture=texture, temporal_smoothing=True,
+                                                          prev_frame_params=prev_frame_params)
+        # extract warm-start params for next batch
+        if batch_ret_dict is not None and '_prev_frame_params' in batch_ret_dict:
+            prev_frame_params = batch_ret_dict.pop('_prev_frame_params')
+        else:
+            prev_frame_params = None
 
         if 'texture' in batch_ret_dict.keys():
             # to save disk space

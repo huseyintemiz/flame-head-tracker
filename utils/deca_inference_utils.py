@@ -45,3 +45,23 @@ def get_flame_code_from_deca(deca, img, device):
     return deca_dict
 
 
+@torch.no_grad()
+def get_flame_code_from_deca_batch(deca, imgs, device):
+    """
+    Batch DECA inference: crop images sequentially (CPU face detector),
+    then encode in one batched GPU call.
+    input:
+        deca: DECA model
+        imgs: list of [H, W, 3] uint8 RGB-channels images
+        device: torch device
+    return:
+        deca_dict: dict with batched tensors
+    """
+    cropped = []
+    for img in imgs:
+        cropped.append(deca.crop_image(img).to(device))
+    batch_tensor = torch.stack(cropped, dim=0)  # [N, 3, 224, 224]
+    deca_dict = deca.encode(batch_tensor)
+    return deca_dict
+
+

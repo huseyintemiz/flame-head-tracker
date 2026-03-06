@@ -68,9 +68,9 @@ tracker_cfg = {
     'original_fps': 25,
     'subsample_fps': 25,
     'save_path': './get_video/tracking_results_timed',
-    'photometric_fitting': False,
+    'photometric_fitting': True,
     'realign': True,
-    'batch_size': 8,
+    'batch_size': 32,
 }
 
 video_path = tracker_cfg['video_path']
@@ -209,6 +209,7 @@ tic("5. Track all frames (total)")
 i = 0
 total_steps = len(frames)
 batch_count = 0
+prev_frame_params = None
 
 # accumulators for per-step timing
 t_tracker_run_total = 0.0
@@ -229,8 +230,15 @@ while i < total_steps:
         photometric_fitting=photometric_fitting,
         shape_code=shape_code, texture=texture,
         temporal_smoothing=True,
+        prev_frame_params=prev_frame_params,
     )
     t_run = toc("   5a. tracker.run (batch)")
+
+    # extract warm-start params for next batch
+    if batch_ret_dict is not None and '_prev_frame_params' in batch_ret_dict:
+        prev_frame_params = batch_ret_dict.pop('_prev_frame_params')
+    else:
+        prev_frame_params = None
     t_tracker_run_total += t_run
 
     if 'texture' in batch_ret_dict.keys():

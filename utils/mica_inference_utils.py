@@ -94,3 +94,34 @@ def get_shape_code_from_mica(mica, img, lmks_68, device):
     return shape_code
 
 
+@torch.no_grad()
+def get_shape_code_from_mica_batch(mica, imgs_bgr, lmks_68_list, device):
+    """
+    Batch MICA inference: preprocess sequentially (CPU), then encode+decode in one GPU call.
+    input:
+        mica: MICA model
+        imgs_bgr: list of [H, W, 3] uint8 BGR-channels images
+        lmks_68_list: list of [68, 2] float32 landmarks
+        device: torch device
+    return:
+        shape_codes: [N, 300] float32 numpy
+    """
+    images = []
+    arcfaces = []
+    for img_bgr, lmks_68 in zip(imgs_bgr, lmks_68_list):
+        img_aligned, arcface = mica_preprocess(img_bgr, lmks_68, image_size=224)
+        img_aligned = cv2.cvtColor(img_aligned, cv2.COLOR_BGR2RGB)
+        img_aligned = np.array(img_aligned).astype(np.float32) / 255
+        image = cv2.resize(img_aligned, (224, 224)).transpose(2, 0, 1)
+        images.append(torch.tensor(image))
+        arcfaces.append(torch.tensor(arcface))
+    images_batch = torch.stack(images, dim=0).to(device)   # [N, 3, 224, 224]
+    arcfaces_batch = torch.stack(arcfaces, dim=0).to(device)  # [N, 1, 3, 112, 112]
+    # squeeze the extra dim from blobFromImages
+    arcfaces_batch = arcfaces_batch.squeeze(1)  # [N, 3, 112, 112]
+    codedict = mica.encode(images_batch, arcfaces_batch)
+    opdict = mica.decode(codedict)
+    shape_codes = opdict['pred_shape_code'].detach().cpu().numpy()  # [N, 300]
+    return shape_codes
+
+

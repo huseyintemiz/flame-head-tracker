@@ -48,3 +48,4 @@ models/models.tar
 *.pt
 *.log
 get_video/tracking_results_timed/
+get_video/comparison
