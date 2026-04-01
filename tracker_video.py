@@ -179,6 +179,7 @@ def track_video(tracker_cfg):
     realign = tracker_cfg['realign']
     batch_size = max(8, tracker_cfg['batch_size'])
     output_fps = tracker_cfg.get('output_fps', tracker_cfg.get('subsample_fps', 25))
+    slim_save = tracker_cfg.get('slim_save', True)
 
     video_base_name = os.path.basename(video_path)
     video_name = video_base_name.split('.')[0] # remove the name extension
@@ -305,13 +306,22 @@ def track_video(tracker_cfg):
             for key in batch_ret_dict:
                 ret_dict[key] = batch_ret_dict[key][j:j+1]
 
+            if slim_save:
+                _slim_skip = {'parsing', 'parsing_aligned', 'img', 'img_aligned', 'img_rendered', 'shape_rendered'}
+                save_dict = {k: v for k, v in ret_dict.items() if k not in _slim_skip}
+            else:
+                save_dict = ret_dict
+
             save_file_path = os.path.join(result_save_path, f'{fid}.npz')
-            np.savez_compressed(save_file_path, **ret_dict)
+            np.savez_compressed(save_file_path, **save_dict)
 
             # generate 5-panel compare image
             with torch.no_grad():
-                loaded_params = np.load(save_file_path)
-                result_img = _generate_compare_image(loaded_params, tracker=tracker, ret_dict=ret_dict)
+                if slim_save:
+                    result_img = _generate_compare_image(ret_dict, tracker=tracker, ret_dict=ret_dict)
+                else:
+                    loaded_params = np.load(save_file_path)
+                    result_img = _generate_compare_image(loaded_params, tracker=tracker, ret_dict=ret_dict)
                 cv2.imwrite(os.path.join(result_save_path, f'{fid}_compare.jpg'), result_img)
 
         i += batch_size

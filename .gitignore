@@ -50,4 +50,10 @@ models/models.tar
 get_video/tracking_results_timed/
 get_video/comparison
 temp/
-output_gs/
+output_gs*/
+ILSH/
+data_ece/
+
+data_ece_others/
+
+SUDFace/
